@@ -76,8 +76,9 @@ a { color: inherit; text-decoration: none; }
 /* ---------- boot splash ---------- */
 #boot { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: grid; place-items: center; transition: opacity 0.4s; }
 #boot.gone { opacity: 0; pointer-events: none; }
-.boot-logo { width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, var(--accent-hi), var(--accent)); box-shadow: 0 0 60px var(--accent-glow); animation: pulse 1.4s ease-in-out infinite; }
-@keyframes pulse { 50% { transform: scale(0.88); opacity: 0.7; } }
+.boot-name { font-weight: 600; font-size: 20px; letter-spacing: -0.01em; animation: pulse 1.4s ease-in-out infinite; }
+.boot-name b { color: var(--text-dim); font-weight: 600; }
+@keyframes pulse { 50% { opacity: 0.45; } }
 
 /* ---------- header ---------- */
 .hd {
@@ -89,11 +90,6 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--border);
 }
 .brand { display: flex; align-items: center; gap: 9px; min-height: 44px; flex: none; }
-.brand-mark {
-  width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; color: #fff;
-  background: linear-gradient(135deg, var(--accent-hi), var(--accent));
-  box-shadow: 0 4px 16px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
 .brand-name { font-weight: 600; letter-spacing: -0.01em; font-size: 17px; }
 .brand-name b { font-weight: 600; color: var(--text-dim); }
 @media (max-width: 400px) { .brand-name b { display: none; } }

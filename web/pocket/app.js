@@ -23,7 +23,6 @@ export const VIEWS = [
 function Brand() {
   return html`
     <a class="brand" href="#/gallery">
-      <span class="brand-mark">${icon('sparkles', { size: 18, sw: 2 })}</span>
       <span class="brand-name">Comfy${' '}<b>Pocket</b></span>
     </a>`;
 }
