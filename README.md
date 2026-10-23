@@ -1,135 +1,117 @@
 # ComfyUI Pocket
 
-Use ComfyUI comfortably from your phone: a fast phone app plus the full node editor, tuned for touch.
+ComfyUI on your phone. A phone app for browsing and generating, plus the real node editor reworked for touch.
 
-## Screenshots
+![Gallery, Generate and Canvas mode on a phone](docs/screenshots/hero.png)
 
-TODO: add screenshots here, e.g. `docs/screenshots/gallery.png`, `docs/screenshots/generate.png`, `docs/screenshots/canvas.png`.
+I built this because the desktop ComfyUI was close to unusable on my phone. Panning stuttered, a finger held on the canvas opened a right-click menu, and running a saved workflow meant fighting a UI made for a mouse. Pocket installs as a custom node and gives you two ways in:
 
-## Features
-
-- **Canvas mode on phones**: runs the *real* ComfyUI frontend smoothly on phones — panning goes from about 16 fps in the stock desktop UI to about 70 fps in Canvas mode on a mid-range Android phone. Every node and custom widget behaves exactly like on the PC.
-- **Forms built automatically from your saved workflows**: Pocket reads your existing ComfyUI workflows and turns them into phone-friendly input forms, with rgthree-style group toggles to bypass or mute groups without touching the graph.
-- **Gallery**: grid view, folders, favorites, search, multi-select delete, fullscreen viewer with swipe, pinch and double-tap, metadata, download/share, and Remix.
-- **Queue**: live progress and previews — including jobs you started on the desktop. Cancel, interrupt or clear jobs, and see recent runs.
-- **Generate**: start from a recent run, a saved workflow, a preset, or a remixed image. Prompts, seeds, steps/cfg/denoise/sampler/scheduler, size (with aspect presets), and models/LoRAs are detected automatically. Pin inputs, set batch size 1-8, save presets.
-- **Sections and switches**: your workflow's groups appear as on/off toggles (like rgthree's Fast Groups Bypasser/Muter), and switch nodes show as toggles at the top of the form.
-- **Text outputs**: text from nodes such as "Preview Any" (e.g. the final prompt written by a prompt-writer LLM) shows on Generate and in Queue, with a copy button.
-- **Installable feel**: add the page to your phone's home screen for an app-like experience.
+- **The phone app** at `/pocket/`. Gallery, live queue, and a Generate screen that reads your saved workflows and builds a form from them.
+- **Canvas mode** at `/pocket/canvas`. The actual ComfyUI editor with a phone layer on top, so every node and custom widget behaves as it does on the PC. On a mid-range Android phone, panning went from about 16 fps to about 70 fps.
 
 ## Install
 
-1. Clone the repo into your ComfyUI `custom_nodes` folder:
+Clone into `custom_nodes` and restart ComfyUI:
 
-   ```
-   git clone https://github.com/Klark61/comfyui-pocket ComfyUI/custom_nodes/comfyui-pocket
-   ```
+```
+cd ComfyUI/custom_nodes
+git clone https://github.com/Klark61/comfyui-pocket
+```
 
-   then restart ComfyUI. (In ComfyUI-Manager you can also use "Install via Git URL" with the same URL.)
-2. No extra Python dependencies — there is nothing to pip-install beyond what ComfyUI itself needs.
-3. Start ComfyUI with `--listen` so your phone can reach it:
+ComfyUI-Manager's "Install via Git URL" works with the same URL. There's nothing to pip-install. Pocket uses the aiohttp and Pillow that ComfyUI already ships with.
 
-   ```
-   python main.py --listen
-   ```
+Your phone has to reach the PC, so start ComfyUI with `--listen`:
 
-4. On the phone, open `http://<PC-IP>:8188/pocket/` (find your PC's IPv4 address with `ipconfig` on Windows or `ip addr` on Linux). Use **Add to Home screen** in the browser menu for an app-like experience.
+```
+python main.py --listen
+```
 
-Phones that open ComfyUI's root URL `/` are automatically redirected to `/pocket/`. Append `?desktop=1` to the URL to opt out and get the desktop UI instead.
+Then open `http://<your-PC-IP>:8188/pocket/` on the phone. "Add to Home screen" makes it open like an app. A phone that opens ComfyUI's normal address gets redirected to `/pocket/`. Add `?desktop=1` to the URL if you want the desktop UI anyway.
 
-## Requirements
+Tested with ComfyUI 0.42 and frontend 1.55, in Chrome on Android. Older versions may work. I haven't checked. Python 3.10 or newer.
 
-- A recent ComfyUI with the new frontend (tested with ComfyUI 0.42 and frontend 1.55; older versions may work but aren't tested)
-- Python 3.10+ (your ComfyUI Python)
-- A modern mobile browser: Chrome on Android or Safari on iOS
+## The phone app
 
-## Usage
+<p>
+  <img src="docs/screenshots/01-gallery.png" width="240" alt="Gallery">
+  <img src="docs/screenshots/02-viewer.png" width="240" alt="Viewer with metadata">
+  <img src="docs/screenshots/03-queue.png" width="240" alt="Queue with a running job">
+</p>
 
-### Gallery
+**Gallery.** Your outputs in a grid, with folders, favorites and search. Tap an image for a fullscreen viewer: swipe between images, pinch to zoom, read the prompt and settings, share or download. Remix sends an image's workflow back to Generate with the same settings.
 
-Grid view of your outputs with folders, favorites, and search. Multi-select to delete (files move to a node-local trash, see [Security](#security)). Tap any image for the fullscreen viewer: swipe between images, pinch or double-tap to zoom, view metadata, download, share, or **Remix** — load the image's workflow back into Generate with its settings.
+**Queue.** Progress and live previews for every job, including the ones you started on the desktop. You can cancel, interrupt or clear jobs. Text that nodes produce, such as the prompt a prompt-writer LLM came up with, shows up here with a copy button.
 
-### Queue
+**Generate.** Pick a saved workflow, a recent run, a preset or an image to remix. Pocket loads the real ComfyUI frontend in a hidden frame and converts the graph the same way the desktop Queue button does, then shows the parts you'd want to change: prompts, seed, steps, CFG, sampler, scheduler, size, models and LoRAs (rgthree Power Lora Loader included). Anything else can be pinned. The first load of a session takes 20 to 30 seconds. After that it's cached.
 
-Watch the queue in real time, with progress and previews for every job — including jobs started on the desktop. Cancel, interrupt or clear jobs, and browse recent runs. Text outputs from nodes (like "Preview Any") appear here too, with a copy button.
+<p>
+  <img src="docs/screenshots/04-generate.png" width="240" alt="Generate form with section toggles">
+  <img src="docs/screenshots/05-all-nodes.png" width="240" alt="All nodes sheet">
+</p>
 
-### Generate
+The Generate screen covers most of what I used to do on the desktop:
 
-Build a form from a recent run, a saved workflow, a preset, or a remixed image. API-format workflow files are loaded directly; a broken workflow file shows a clear error explaining why.
+- Groups show up as on/off toggles, the way rgthree's Fast Groups Bypasser and Muter work. A toggle re-converts the workflow in about a second and keeps your edits. Single nodes can be bypassed too.
+- Switch nodes (ComfySwitchNode, Impact switches, boolean primitives) become toggles at the top.
+- LoadImage inputs take a photo from the camera or the library. Large or HEIC photos are converted to JPEG on the phone first. You can also reuse one of your outputs.
+- "All nodes" lists every node grouped like the workflow, with search, and lets you edit any input.
+- Each seed follows the workflow's own "control after generate" setting (randomize, fixed, increment). Your toggle wins if you change it.
+- API-format workflow files load directly. A broken file gets an error that says what's wrong with it.
 
-- **Sections**: your workflow's groups are listed like rgthree's "Fast Groups Bypasser/Muter" node on the desktop, each with an on/off toggle that bypasses or mutes the group. Under them, "All groups" lists every group in the workflow with its own toggle, and "Advanced: single nodes" bypasses any individual node. A toggle re-converts the workflow in about a second and keeps the edits you have made. Toggles are remembered on reload, and are saved with presets and snapshots.
-- **Switches**: switch nodes ("Enhance prompt?" ComfySwitchNode, Impact switches, boolean primitives) show as toggles at the top of the form.
-- **Images**: LoadImage inputs show a thumbnail of the chosen image. "Choose photo" uses your phone's camera or photo library, and large or HEIC photos are converted to JPEG automatically. "Pick from my outputs" reuses a past result. LoadImageMask warns when the chosen image has no alpha channel.
-- **All nodes**: a sheet lists every node, grouped the same way as the workflow, with search, every input editable, and a bypass switch per node.
-- **Text outputs**: text from nodes such as "Preview Any" (for example the final prompt written by a prompt-writer LLM) shows on Generate and in Queue, with a copy button.
-- **Seeds**: each seed follows its own "control after generate" setting from the workflow (randomize, fixed, increment, decrement). Your own toggle overrides it.
+## Canvas mode
 
-Detected inputs include prompts, seeds, steps/cfg/denoise/sampler/scheduler, size (with aspect presets), and models/LoRAs, including rgthree Power Lora Loader. Pin any input, set batch size 1-8, and save presets.
+<img src="docs/screenshots/06-canvas.png" width="240" align="right" alt="Canvas mode with the touch toolbar">
 
-### Canvas mode
+Switch Generate from Simple to Canvas, or tap "Open in canvas" in the workflow list. You get the real editor, so custom nodes and their widgets work. Save writes to the same workflow file the PC uses, and switching back to Simple reloads it with your changes.
 
-Canvas mode is the full ComfyUI node editor on your phone: the real ComfyUI graph with a phone layer on top, so every node and every custom widget works the same as it does on the PC.
+Two fingers move and zoom the view. While your fingers are down, the picture is slid around on the GPU and redrawn once you let go, so you might see blank edges or a bit of blur for a moment. One finger works on the graph: drag a node, drag a group by its title, or drag from an output dot to an input dot to connect. Holding a finger still doesn't open a menu. The Menu button does that, for the selected node or for the canvas.
 
-- **Opening it**: in Generate, use the "Simple | Canvas" switch. From the workflow list, use "Open in canvas". To go back, pick "Simple" in the toolbar's ⋯ menu: it returns to the phone form and reloads the workflow, so the edits you made on the canvas show up.
-- **Gestures**: two-finger pan and pinch zoom. They stay smooth because the picture is redrawn sharp when you lift your fingers. One finger works on the graph: drag a node (or a group by its title) to move it, drag from an output dot to an input dot to connect them, tap to select. Holding a finger never opens a menu by itself; use the **Menu** button in the bottom bar for the selected node's (or the canvas) menu. One finger on empty canvas does nothing by default (a tap deselects); the gear in **More > Settings** switches it to Pan or Box select and can turn on an opt-in long-press menu (settings stay on the phone, in localStorage). Tap a text box to edit it full screen.
-- **Toolbar**: Add (search for a node), Delete, Bypass, Undo, Run (with a progress pill), Save, and ⋯. Save writes to the same workflow file as the PC. The ⋯ menu holds Mute, Redo, Fit view, Simple, and "Full extensions", which reloads with every extension loaded; use it if a node you add looks plain.
-- **Phone tweaks stay on the phone**: canvas mode never changes your desktop ComfyUI settings. Unsaved changes survive a reload, shown as "Restored unsaved changes · Discard".
-- **Speed**: to load faster, canvas mode only loads the extensions the workflow needs. See [docs/performance.md](docs/performance.md) for measurements.
+The toolbar has Add, Delete, Bypass, Undo, Run, Save and Menu. The ⋯ button holds Mute, Redo, Fit view, Simple and Settings. In Settings you can make one finger on empty canvas pan or box-select instead of doing nothing, and turn on a long-press menu if you want one.
 
-### How saved workflows load
+Canvas mode keeps its phone tweaks on the phone and never touches your desktop settings. To load faster it only loads the extensions your workflow needs. If a node you add looks plain, ⋯ → Full extensions reloads with everything. Unsaved edits survive a reload.
 
-The phone loads the real ComfyUI frontend in a hidden frame once per session (about 20-30 seconds the first time). It converts the graph exactly like the desktop "Queue" button, and the result is cached as a snapshot. The desktop also auto-snapshots a saved workflow each time it is queued. You can also use File > "Send workflow to Mobile".
+[docs/performance.md](docs/performance.md) has the measurements and what each change was worth.
 
-### Where data lives
-
-- `user/default/comfyui-pocket/`: favorites, workflow snapshots, presets
-- `custom_nodes/comfyui-pocket/data/trash/`: deleted images (auto-purged)
-- `custom_nodes/comfyui-pocket/cache/thumbs/`: thumbnail cache
+<br clear="right">
 
 ## Security
 
-- ComfyUI has **no authentication**, so only use this on a trusted LAN, or behind a VPN or a reverse proxy with auth.
-- **Never expose port 8188 to the internet** (no port-forwarding).
-- Deleting images is soft at first: files move to a node-local trash (`data/trash`, not served by ComfyUI) and are permanently erased after 30 days (`COMFYUI_POCKET_TRASH_DAYS`).
-- Live job progress is visible to any client on your LAN, as in stock ComfyUI.
+ComfyUI has no login, and neither does Pocket. Use it on your home network, or behind a VPN or a reverse proxy that asks for a password. Don't forward port 8188 to the internet.
+
+Deleting an image moves it to `data/trash` inside the node folder. ComfyUI doesn't serve that folder. Files there are erased for good after 30 days, which you can change with `COMFYUI_POCKET_TRASH_DAYS`. As with stock ComfyUI, anyone on your network can watch job progress.
+
+## Where things are stored
+
+- `user/default/comfyui-pocket/`: favorites, workflow snapshots and presets
+- `custom_nodes/comfyui-pocket/data/trash/`: deleted images
+- `custom_nodes/comfyui-pocket/cache/thumbs/`: thumbnails, capped at 300 MB (`COMFYUI_POCKET_THUMB_CACHE_MB`)
 
 ## Troubleshooting
 
-- **The phone can't connect**: allow port 8188 through your firewall (on Windows, add an inbound rule for TCP 8188), make sure ComfyUI was started with `--listen`, and check the phone is on the same Wi-Fi network as the PC.
-- **The first load is slow**: the phone loads the ComfyUI frontend once per session (about 20-30 s) to convert workflows exactly like the desktop does. This is expected; subsequent opens are fast.
-- **Canvas mode: a node looks plain**: some widgets come from extensions that were not loaded — open ⋯ → **Full extensions** and reload.
-- **The menu on long-press is off by default**: holding a finger never opens a menu unless you enable it — see ⋯ → **Settings**.
+**The phone can't connect.** Check that ComfyUI was started with `--listen`, that the phone is on the same Wi-Fi, and that your firewall allows TCP port 8188. On Windows that means an inbound rule.
 
-## Testing
+**Generate takes a while the first time.** That's the hidden frame loading the ComfyUI frontend. It happens once per session.
 
-Run these from this folder:
+**A node looks plain in Canvas mode.** Its extension wasn't loaded. Use ⋯ → Full extensions.
+
+## Development
+
+Unit tests don't need ComfyUI running:
 
 ```
 node tests/test_fields.mjs
 node tests/test_sections.mjs
 node tests/test_nodes.mjs
-python -m pytest tests
 node tests/test_gestures.mjs
-node tests/check_nodes_live.mjs          # needs ComfyUI running
-node tests/check_canvas_boot.mjs         # needs ComfyUI running
-node tests/check_gestures.mjs            # needs ComfyUI running
-node tests/check_canvas_toolbar.mjs      # needs ComfyUI running
-node tests/e2e_phone.mjs                 # needs ComfyUI running
-node tests/e2e_canvas_roundtrip.mjs      # needs ComfyUI running
-node tests/e2e_scenarios.mjs             # queues real GPU runs
-node tests/perf_canvas.mjs --limit 500   # phone performance measurement
+node tests/test_canvas_prefs.mjs
+node tests/test_storage_migrate.mjs
+python -m pytest tests
 ```
 
-The `node tests/test_*.mjs` files and `python -m pytest tests` are unit tests and need nothing running. The browser/integration scripts (`check_*.mjs`, `e2e_*.mjs`, `perf_canvas.mjs`) need a running ComfyUI and Chrome, plus the `COMFY_ROOT`, `WF_DIR` and `CHROME` environment variables — see [tests/README.md](tests/README.md).
+The browser checks (`check_*.mjs`, `e2e_*.mjs`, `perf_canvas.mjs`) drive Chrome against a running ComfyUI using the sample workflows in `tests/fixtures/`. `e2e_scenarios.mjs` queues real jobs on your GPU. [tests/README.md](tests/README.md) explains the setup and the `COMFY_ROOT`, `WF_DIR` and `CHROME` variables. `tests/make_screenshots.mjs` rebuilds the images in this README from generated demo content.
 
-## Contributing
-
-Issues and pull requests are welcome. Please run the unit tests (`node tests/test_*.mjs` and `python -m pytest tests`) before submitting.
-
-## Credits / Third-party
-
-This project vendors Preact, preact/hooks and htm. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Issues and pull requests are welcome. Please run the unit tests first.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). Pocket bundles Preact (MIT) and htm (Apache-2.0); details in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
