@@ -1,8 +1,8 @@
-# ComfyUI Pocket
+# ComfyUI Mobile Pocket
 
-ComfyUI on your phone. A phone app for browsing and generating, plus the real node editor reworked for touch.
+A ComfyUI mobile UI for your phone (Android and iOS). Use ComfyUI from your phone with a fast mobile app for browsing and generating, plus the real node editor reworked for touch.
 
-![ComfyUI Pocket](docs/screenshots/banner.png)
+![ComfyUI Mobile Pocket: ComfyUI mobile interface for phones](docs/screenshots/banner.png)
 
 I built this because the desktop ComfyUI was close to unusable on my phone. Panning stuttered, a finger held on the canvas opened a right-click menu, and running a saved workflow meant fighting a UI made for a mouse. Pocket installs as a custom node and gives you two ways in:
 
@@ -15,7 +15,7 @@ Clone into `custom_nodes` and restart ComfyUI:
 
 ```
 cd ComfyUI/custom_nodes
-git clone https://github.com/Klark61/comfyui-pocket
+git clone https://github.com/Klark61/ComfyUI-Mobile-Pocket
 ```
 
 ComfyUI-Manager's "Install via Git URL" works with the same URL. There's nothing to pip-install. Pocket uses the aiohttp and Pillow that ComfyUI already ships with.
