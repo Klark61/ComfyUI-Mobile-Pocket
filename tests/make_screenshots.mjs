@@ -155,12 +155,7 @@ async function main() {
   await waitFor(`document.querySelectorAll('.gsheet li.srow.wf').length>0`);
   await ev(`document.querySelector('.gsheet li.srow.wf .srow-main').click(); true`);
   await waitFor(`!!document.querySelector('.gen.has')&&!document.querySelector('.qcard.prep')&&!document.querySelector('.fgroup.sections[aria-busy="true"]')&&!document.querySelector('.gen-go').disabled`, 60000);
-  await waitFor(`!document.querySelector('.fgroup.sections .spinner-s')&&!document.querySelector('.fgroup.sections .btn.primary[disabled]')`, 25000).catch(() => {});
-  await sleep(800);
-  await ev(`document.querySelector('.fgroup.sections').scrollIntoView({block:'start'}); window.scrollBy(0,-70); true`);
-  await sleep(600);
-  await shot('04-generate.png');
-  await ev(`window.scrollTo(0,0); true`);
+  await sleep(1500);
   step('all nodes');
   await click('.gentools .chip', 'all nodes');
   await waitFor(`!!document.querySelector('.gsheet[aria-label="All nodes"]')&&document.querySelectorAll('.nnode').length>0`);
@@ -169,23 +164,44 @@ async function main() {
   await shot('05-all-nodes.png');
   killAll();
 
-  step('canvas');
-  const file = 'Demo playground.json', dst = path.join(WF_DIR, file);
-  if (fs.existsSync(dst)) throw new Error('refusing to overwrite ' + dst);
-  process.on('exit', () => { try { fs.rmSync(dst, { force: true }); } catch {} });
-  fs.copyFileSync(path.join(FIXTURE_DIR, 'canvas_playground.json'), dst);
+  step('live: generate');
+  // Generate (with a real Sections card) and Canvas need the real desktop frontend, so they run on the live server behind the privacy guard.
+  const mk = (src, name) => { const dst = path.join(WF_DIR, name); if (fs.existsSync(dst)) throw new Error('refusing to overwrite ' + dst); process.on('exit', () => { try { fs.rmSync(dst, { force: true }); } catch {} }); fs.copyFileSync(path.join(FIXTURE_DIR, src), dst); return name; };
+  const genWf = mk('group_bypass.json', 'Demo text to image.json'), file = mk('canvas_playground.json', 'Demo playground.json');
   await startChrome(); await newTab();
+  await privacyGuard();
+  await send('Page.navigate', { url: `${LIVE}/pocket/#/generate` });
+  await waitFor(`!!document.querySelector('.gen')`, 30000);
+  await sleep(500);
+  await ev(`(document.querySelector('.hero .start')||document.querySelector('.srcard .btn')).click(); true`);
+  await waitFor(`document.querySelectorAll('.gsheet [role=tab]').length>0`);
+  await ev(`[...document.querySelectorAll('.gsheet [role=tab]')].find((b)=>/workflows/i.test(b.textContent)).click(); true`);
+  await waitFor(`[...document.querySelectorAll('.gsheet li.srow.wf strong')].some((e)=>e.textContent.trim()==='Demo text to image')`);
+  await ev(`[...document.querySelectorAll('.gsheet li.srow.wf')].find((r)=>r.querySelector('strong').textContent.trim()==='Demo text to image').querySelector('.srow-main').click(); true`);   // never screenshot while this list is open
+  await waitFor(`!!document.querySelector('.gen.has')&&!document.querySelector('.qcard.prep')&&!document.querySelector('.fgroup.sections[aria-busy="true"]')&&!document.querySelector('.gen-go').disabled`, 60000);
+  await waitFor(`!!document.querySelector('.fgroup.sections .sec-disc')`, 60000);   // live frontend loads the structure on its own
+  await ev(`[...document.querySelectorAll('.fgroup.sections .sec-disc')].filter((b)=>/all groups/i.test(b.textContent)&&b.getAttribute('aria-expanded')!=='true').forEach((b)=>b.click()); true`);
+  await waitFor(`document.querySelectorAll('.fgroup.sections .secrow').length>0&&!document.querySelector('.fgroup.sections[aria-busy="true"]')`, 60000);
+  await sleep(1000);
+  await ev(`const e=document.querySelector('.fgroup.sections');e.style.scrollMarginTop='125px';e.scrollIntoView({block:'start'}); true`);
+  await sleep(600);
+  await shot('04-generate.png');
+  step('canvas');
+  await newTab();
   await privacyGuard();
   await send('Page.navigate', { url: `${LIVE}/pocket/canvas?path=${encodeURIComponent(file)}` });
   await waitFor(`!!(window.__canvasBoot&&window.__canvasBoot.toolbarState==='installed')`, 60000);
   await waitFor(`!!(window.app&&app.canvas&&app.graph&&app.graph._nodes.length)`, 30000);
   await sleep(1500);
   await ev(`document.querySelectorAll('button[aria-label=Close]').forEach((b)=>{if(b.closest('[role=alert],[role=status]'))b.click()}); true`);
-  await ev(`(()=>{const c=app.canvas,ns=app.graph._nodes;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
-    for(const n of ns){x0=Math.min(x0,n.pos[0]);y0=Math.min(y0,n.pos[1]-30);x1=Math.max(x1,n.pos[0]+n.size[0]);y1=Math.max(y1,n.pos[1]+n.size[1]);}
-    const W=c.canvas.clientWidth,H=c.canvas.clientHeight-160,bw=x1-x0,bh=y1-y0;c.low_quality_zoom_threshold=0.05;const s=0.7;
-    c.ds.scale=s;c.ds.offset=[-x0+10/s,-y0+110/s];c.setDirty(true,true);return true})()`);
-  await sleep(1000);
+  // compact, in-memory layout of the first nodes (never saved) so the graph fills the screen at a readable zoom
+  await ev(`(()=>{const c=app.canvas,g=app.graph;
+    const L={1:[15,70,285,100],2:[15,215,285,170],3:[310,70,285,150],4:[310,250,285,130],5:[15,455,285,300],10:[310,455,285,82],7:[310,570,285,270],6:[15,790,200,60]};
+    for(const n of g._nodes){const l=L[n.id];if(l){n.pos=[l[0],l[1]];n.size=[l[2],l[3]];}else n.pos=[6000+n.id*50,0];n.has_errors=false;}
+    const gr=g._groups;if(gr[0]){gr[0].pos=[0,0];gr[0].size=[610,405];}if(gr[1]){gr[1].pos=[0,405];gr[1].size=[610,470];}
+    app.lastNodeErrors=null;if(app.canvas.selected_nodes)app.canvas.deselectAll&&app.canvas.deselectAll();
+    const s=0.66;c.ds.scale=s;c.ds.offset=[4/s,150/s];c.setDirty(true,true);return true})()`);
+  await sleep(1200);
   await shot('06-canvas.png');
   killAll();
 
