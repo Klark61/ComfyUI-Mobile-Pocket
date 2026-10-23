@@ -1,0 +1,1 @@
+# no extra dependencies; uses ComfyUI's aiohttp and Pillow

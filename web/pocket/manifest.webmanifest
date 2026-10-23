@@ -1,0 +1,14 @@
+{
+  "name": "ComfyUI Pocket",
+  "short_name": "Comfy",
+  "description": "Phone-first gallery, queue and generator for ComfyUI",
+  "start_url": "/pocket/",
+  "scope": "/pocket/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0b10",
+  "theme_color": "#0a0b10",
+  "icons": [
+    { "src": "/pocket/static/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

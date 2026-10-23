@@ -1,0 +1,14 @@
+cache/
+__pycache__/
+tests/e2e-last.log
+
+data/
+.claude/
+NOTES.md
+*.log
+.pytest_cache/
+node_modules/
+.vscode/
+.idea/
+*.orig
+*.bak

@@ -1,0 +1,107 @@
+/* Canvas mode (phone layer over the real ComfyUI frontend). Loaded only by GET /pocket/canvas.
+   Hides what steals touches or canvas area on a ~412 px viewport. Task 4 adds the touch toolbar. */
+html body .side-toolbar-container,        /* left icon strip (sidebar tabs) */
+html body .actionbar-container,           /* top floating Run / queue / extension button groups */
+html body #crystools-monitors-root,       /* Crystools CPU/GPU/RAM monitor */
+html body .crystools-monitors-container,
+html body #donut-civitai-btn,             /* CivitAI floating button */
+html body #comfyui-body-bottom,           /* custom-scripts image feed bar */
+html body .pysssss-image-feed,
+html body div[class*="w-[350px]"][class*="max-h-[60vh]"],  /* job queue / history panel (opens by itself while a job runs) */
+html body div[class*="inset-x-0"][class*="bottom-0"][class*="z-1200"],  /* bottom zoom / select-mode / minimap bar (Task 4 toolbar replaces it) */
+html body .comfyui-menu,                  /* legacy top menu, if an extension revives it */
+html body .p-toast .p-toast-message[data-canvas-hide] {
+  display: none !important;
+}
+
+html, body { overscroll-behavior: none; }
+@supports (height: 100dvh) {
+  html, body { height: 100dvh; }
+}
+html body #graph-canvas {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+/* Android long-press highlight / text-selection "square": nothing on the canvas page is selectable except real text fields */
+html.canvas-mode body, html.canvas-mode .graph-canvas-container, html.canvas-mode .litegraph {
+  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+}
+html.canvas-mode input, html.canvas-mode textarea, html.canvas-mode [contenteditable="true"], html.canvas-mode .cvt-sheet-area {
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+}
+
+/* ---- Task 4: touch toolbar (web/canvas/toolbar.js) ---- */
+.cvt-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+  display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+  background: rgba(32, 33, 38, .96); border-top: 1px solid #44464f; box-sizing: border-box;
+  -webkit-user-select: none; user-select: none; touch-action: pan-x;
+}
+.cvt-bar::-webkit-scrollbar { display: none; }
+.cvt-btn {
+  flex: 1 0 48px; min-width: 48px; height: 48px; padding: 2px 0 0; border: 0; border-radius: 10px; background: transparent; color: #e6e6ea;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font: 500 10px/1.1 system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.cvt-btn:active:not(:disabled) { background: #3a3c46; }
+.cvt-btn:disabled { opacity: .35; }
+.cvt-btn[data-act="run"] { color: #7fe39a; }
+.cvt-btn[data-act="run"].busy { color: #ffd166; }
+.cvt-pill {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 1001; max-width: 90vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 6px 14px; border-radius: 16px; color: #fff; font: 600 13px system-ui, sans-serif;
+  background: linear-gradient(90deg, #2f7d4a var(--p, 0%), #2b2d35 var(--p, 0%)); border: 1px solid #55586a;
+}
+.cvt-pill[hidden], .cvt-menu[hidden] { display: none; }
+.cvt-menu {
+  position: fixed; right: 6px; z-index: 1002; bottom: calc(60px + env(safe-area-inset-bottom, 0px)); min-width: 220px;
+  background: #2b2d35; border: 1px solid #55586a; border-radius: 12px; padding: 4px; box-shadow: 0 6px 24px rgba(0,0,0,.5);
+}
+.cvt-menu-item { display: block; width: 100%; min-height: 48px; text-align: left; padding: 0 14px; border: 0; background: transparent; color: #e6e6ea; font: 500 15px system-ui, sans-serif; border-radius: 8px; }
+.cvt-menu-item:active { background: #3a3c46; }
+.cvt-toast {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 3100; bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 16px; border-radius: 16px; background: #111; color: #fff; font: 500 13px system-ui, sans-serif; border: 1px solid #55586a; max-width: 90vw;
+}
+/* multiline widget editor sheet */
+.cvt-sheet { position: fixed; left: 0; right: 0; top: 0; height: 100dvh; z-index: 3000; display: flex; flex-direction: column; background: #1b1c20; color: #e6e6ea; }
+.cvt-sheet-head { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px solid #44464f; }
+.cvt-sheet-title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; font: 600 14px system-ui, sans-serif; }
+.cvt-sheet-btn { min-width: 72px; height: 48px; border: 0; border-radius: 10px; background: #34363f; color: #fff; font: 600 15px system-ui, sans-serif; }
+.cvt-sheet-btn.primary { background: #2f7d4a; }
+.cvt-sheet-area { flex: 1; width: 100%; box-sizing: border-box; padding: 12px; border: 0; outline: 0; resize: none; background: #1b1c20; color: #f2f2f5; font: 16px/1.4 system-ui, sans-serif; }
+/* node search box on a phone: full width, big rows */
+html.canvas-mode .p-dialog-mask:has(.comfy-vue-node-search-box) { align-items: flex-start !important; padding: 0 !important; }
+html.canvas-mode .p-dialog:has(.comfy-vue-node-search-box) { width: 100vw !important; max-width: 100vw !important; min-width: 0 !important; margin: 0 !important; max-height: 100dvh !important; }
+html.canvas-mode .comfy-vue-node-search-box { width: 100% !important; }
+html.canvas-mode .comfy-vue-node-search-box input { font-size: 18px !important; min-height: 48px; }
+html.canvas-mode .p-autocomplete-overlay { width: 100vw !important; min-width: 0 !important; max-width: 100vw !important; left: 0 !important; max-height: 60dvh !important; }
+html.canvas-mode .p-autocomplete-option { min-height: 52px; font-size: 16px; display: flex; align-items: center; }
+/* litegraph context menu: bigger rows */
+html.canvas-mode .litegraph.litecontextmenu .litemenu-entry { font-size: 16px !important; padding: 12px 14px !important; min-height: 44px; }
+/* current (v2) node search dialog: [role=search] */
+html.canvas-mode .p-dialog:has([role="search"]) { width: 100vw !important; max-width: 100vw !important; min-width: 0 !important; margin: 0 !important; }
+html.canvas-mode [role="search"] > div { height: min(70dvh, 750px) !important; border-radius: 0 0 12px 12px !important; }
+html.canvas-mode [role="search"] input[role="combobox"] { font-size: 18px !important; height: 32px !important; min-width: 0 !important; }
+html.canvas-mode #results-list [role="option"] { min-height: 56px; font-size: 16px; }
+/* 8 primary buttons share the width: no horizontal scroll at 412 px (8 x 48 + gaps + padding = 406) */
+.cvt-bar { overflow-x: hidden; }
+.cvt-btn { flex: 1 1 0; min-width: 48px; }
+.cvt-chip {
+  position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 1001; display: flex; align-items: center; gap: 4px;
+  max-width: 94vw; padding: 2px 4px 2px 14px; border-radius: 24px; background: #2b2d35; border: 1px solid #55586a; color: #e6e6ea; font: 500 13px system-ui, sans-serif; white-space: nowrap;
+}
+.cvt-chip-btn { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: #ffd166; font: 700 13px system-ui, sans-serif; }
+.cvt-chip-x { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: #aaa; font: 20px system-ui, sans-serif; }
+/* settings sheet (gear in the More menu) */
+.cvt-set-body { flex: 1; overflow-y: auto; padding: 8px 12px 24px; }
+.cvt-set-row { padding: 12px 0; border-bottom: 1px solid #33353d; }
+.cvt-set-row.dim { opacity: .5; }
+.cvt-set-title { font: 600 15px system-ui, sans-serif; margin-bottom: 8px; }
+.cvt-set-hint { font: 400 12px/1.3 system-ui, sans-serif; color: #9a9ca8; margin-top: 6px; }
+.cvt-seg { display: flex; gap: 6px; }
+.cvt-seg-btn { flex: 1; min-height: 48px; border: 1px solid #44464f; border-radius: 10px; background: #26272d; color: #e6e6ea; font: 500 14px system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+.cvt-seg-btn.on { background: #2f7d4a; border-color: #3d9a5d; color: #fff; }

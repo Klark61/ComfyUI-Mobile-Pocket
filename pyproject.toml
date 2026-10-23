@@ -1,0 +1,20 @@
+[project]
+name = "comfyui-pocket"
+version = "1.0.0"
+description = "Pocket: phone-first UI for ComfyUI: gallery, queue, and generate."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+# No extra dependencies: Pocket uses the aiohttp and Pillow that ComfyUI already ships.
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Klark61/comfyui-pocket"
+Issues = "https://github.com/Klark61/comfyui-pocket/issues"
+
+[tool.comfy]
+# Fill in your Comfy Registry publisher id (https://registry.comfy.org) before running `comfy node publish`.
+PublisherId = ""
+DisplayName = "ComfyUI Pocket"
+# SVG icon; if the registry rejects SVG, replace with a 400x400 PNG.
+Icon = "https://raw.githubusercontent.com/Klark61/comfyui-pocket/main/web/pocket/icon.svg"

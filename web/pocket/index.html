@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b10">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Phone-first gallery, queue and generator for ComfyUI">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ComfyUI Pocket</title>
+  <link rel="manifest" href="/pocket/static/manifest.webmanifest">
+  <link rel="icon" href="/pocket/static/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/pocket/static/icon.svg">
+  <link rel="stylesheet" href="/pocket/static/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "preact": "/pocket/static/vendor/preact.module.js",
+      "preact/hooks": "/pocket/static/vendor/hooks.module.js",
+      "htm": "/pocket/static/vendor/htm.module.js"
+    }
+  }
+  </script>
+  <link rel="modulepreload" href="/pocket/static/app.js">
+</head>
+<body>
+  <div id="boot" role="status" aria-label="Loading"><div class="boot-logo"></div></div>
+  <div id="app"></div>
+  <noscript>ComfyUI Pocket needs JavaScript.</noscript>
+  <script type="module" src="/pocket/static/app.js"></script>
+</body>
+</html>
