@@ -13,8 +13,7 @@ Repository = "https://github.com/Klark61/ComfyUI-Mobile-Pocket"
 Issues = "https://github.com/Klark61/ComfyUI-Mobile-Pocket/issues"
 
 [tool.comfy]
-# Fill in your Comfy Registry publisher id (https://registry.comfy.org) before running `comfy node publish`.
-PublisherId = ""
+PublisherId = "klark"
 DisplayName = "ComfyUI Mobile Pocket"
 # SVG icon; if the registry rejects SVG, replace with a 400x400 PNG.
 Icon = "https://raw.githubusercontent.com/Klark61/ComfyUI-Mobile-Pocket/main/web/pocket/icon.svg"
