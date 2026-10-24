@@ -170,7 +170,8 @@ class FakeComfy:
         await emit("execution_cached", {"nodes": cached, "prompt_id": pid})
         states = {n: {"value": 0, "max": 1, "state": "pending", "node_id": n, "prompt_id": pid, "display_node_id": n, "parent_node_id": None, "real_node_id": n} for n in prompt}
         for n in cached:
-            states[n]["state"] = "finished"; states[n]["value"] = 1
+            states[n]["state"] = "finished"
+            states[n]["value"] = 1
 
         async def pstate():
             if targeted:
@@ -188,7 +189,8 @@ class FakeComfy:
                     if self.interrupt:
                         break
                     await asyncio.sleep(self.step_ms / 1000)
-                    states[node]["value"] = step; states[node]["max"] = steps
+                    states[node]["value"] = step
+                    states[node]["max"] = steps
                     if targeted:
                         await self.send_json("progress", {"value": step, "max": steps, "prompt_id": pid, "node": node}, sid, everyone=False)
                         await pstate()
